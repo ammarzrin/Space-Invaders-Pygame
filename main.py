@@ -49,7 +49,7 @@ def player(x, y):
 
 
 def enemy(x, y):
-    screen.blit(enemyImg, (x, y))  # Blit means to draw onto the screen
+    screen.blit(enemyImg, (x, y))
 
 
 def fire_bullet(x,y):
