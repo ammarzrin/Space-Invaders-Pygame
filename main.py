@@ -14,6 +14,11 @@ screen = pygame.display.set_mode((800, 600))
 #  Background
 background = pygame.image.load('background.png')
 
+# Background Music
+pygame.mixer.music.load('background.mp3')
+pygame.mixer.music.set_volume(0.05)
+pygame.mixer.music.play(-1)
+
 #  Title and Icon
 pygame.display.set_caption("Space Invaders")
 icon = pygame.image.load('ufo.png')
@@ -52,7 +57,25 @@ bulletX_change = 0
 bulletY_change = 10
 bullet_state = 'ready'
 
-score = 0
+# Score
+score_value = 0
+font = pygame.font.Font('freesansbold.ttf', 32)
+
+textX = 10
+textY = 10
+
+# Game Over text
+over_font = pygame.font.Font('freesansbold.ttf', 64)
+
+
+def show_score(x, y):
+    score = font.render("Score : " + str(score_value), True, (255, 255, 255))
+    screen.blit(score, (x, y))
+
+
+def game_over_text():
+    over_text = over_font.render("Game Over!", True, (255, 255, 255))
+    screen.blit(over_text, (200, 250))
 
 
 def player(x, y):
@@ -99,6 +122,8 @@ while running:
                 playerX_change = 10
             if event.key == pygame.K_SPACE:
                 if bullet_state == 'ready':
+                    bullet_sound = pygame.mixer.Sound('pew.mp3')
+                    bullet_sound.play()
                     # Get the current X coordinate of spaceship
                     bulletX = playerX
                     fire_bullet(bulletX, bulletY)
@@ -117,6 +142,14 @@ while running:
 
     #  Enemy movement
     for i in range(num_of_enemies):
+
+        # Game Over
+        if enemyY[i] > 440:
+            for j in range(num_of_enemies):
+                enemyY[j] = 2000
+            game_over_text()
+            break
+
         enemyX[i] += enemyX_change[i]
         if enemyX[i] <= 0:
             enemyX_change[i] = 4
@@ -128,9 +161,11 @@ while running:
         # Collision
         collision = isCollision(enemyX[i], enemyY[i], bulletX, bulletY)
         if collision:
+            explosion_sound = pygame.mixer.Sound('gotcha.mp3')
+            explosion_sound.play()
             bulletY = 480
             bullet_state = 'ready'
-            score += 1
+            score_value += 1
             enemyX[i] = random.randint(0, 735)
             enemyY[i] = random.randint(50, 150)
 
@@ -146,5 +181,5 @@ while running:
         bulletY -= bulletY_change
 
     player(playerX, playerY)
-
+    show_score(textX, textY)
     pygame.display.update()
